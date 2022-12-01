@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family Tree</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <style>
+        rect{
+            fill:white;
+            stroke: silver;
+            width: 80px;
+            height: 40px;
+            stroke-width:2 ;
+        }
+        path{
+            fill:none;
+            stroke:silver;
+            stroke-width:2 ;
+        }
+        text{
+             text-align: center;
+            text-anchor:middle;
+        }
+        .bigger
+        {
+           font-size: 20px; 
+        }
+    </style>
+</head>
+<body>
+    <script>
+          var svg=d3.select("body").append("svg")
+                    .attr("width", 900).attr("height",600)
+                    .append("g").attr("transform","translate(50,50)");
+           var data =[{"child":"John", "parent":""},
+                      {"child":"Aarohi", "parent":"Kalpit"},
+                      {"child":"Kalpit", "parent":"John"},
+                      {"child":"Hari", "parent":"Anil"},
+                      {"child":"Reva", "parent":"Sara"},
+                      {"child":"Anil", "parent":"John"},
+                      {"child":"Sara", "parent":"Kalpit"},
+                      {"child":"Mark", "parent":"Anil"},
+                      {"child":"Angel", "parent":"Sara"},
+                      {"child":"Tom", "parent":"Hari"}
+                  ] ;
+            
+             var dataStructure = d3.stratify()
+                                   .id(function(d){return d.child;})
+                                   .parentId(function(d){return d.parent;})
+                                   (data);
+            var treeStructure = d3.tree().size([650,300]);
+            var information = treeStructure(dataStructure);
+            console.log(information.descendants());
+            console.log(information.links());
+
+            var connections = svg.append("g").selectAll("path")
+                                  .data(information.links());
+             connections.enter().append("path")  
+                       .attr("d",function(d){
+                        return "M" + d.source.x + "," + d.source.y + " v 50  H" +
+                        d.target.x +" V " +d.target.y;
+                       }) ;
+                                  
+           var  rectangles= svg.append("g").selectAll("rect")
+                            .data(information.descendants());
+           rectangles.enter().append("rect")
+                  .attr("x", function(d){return d.x-40;})
+                  .attr("y", function(d){return d.y-20;});
+                  
+              var names = svg.append("g").selectAll("text")
+                              .data(information.descendants()) ;
+               names.enter().append("text")     
+                            .text(function(d){return d.data.child;})
+                            .attr("x", function(d){return d.x;})
+                            .attr("y", function(d){return d.y;})
+                            .classed("bigger", true);
+
+    </script>
+    
+</body>
+</html>
